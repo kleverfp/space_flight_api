@@ -1,0 +1,3 @@
+{
+    "mongoURI":"mongodb+srv://ferreira:Kfp_2008@cluster0.lfza1.mongodb.net/spaceflightdb?retryWrites=true&w=majority"
+}
