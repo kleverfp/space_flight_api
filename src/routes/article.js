@@ -9,9 +9,25 @@ router.get('/',(req,res)=>{
 });
 
 router.get('/articles',async(req,res)=>{
-    const articles = await Article.find();
+    const { page = 1, limit = 10 } = req.query;
+    try{
+        const articles = await Article.find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec();
 
-    res.status(200).json(articles);
+        // get total documents in the Posts collection 
+        const count = await Article.countDocuments();
+
+        // return response with posts, total pages, and current page
+        res.json({
+            articles,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page
+        });
+    }catch(err){
+        res.status(500).json({errors:[{msg:'server error'}]});
+    }
 });
 
 router.get('/articles/:id',async(req,res)=>{
@@ -33,13 +49,21 @@ router.post('/articles',[
     body('title','title is required').trim().not().isEmpty(),
     body('url','url is required').trim().not().isEmpty(),
 ],async (req,res)=>{
-    const errors = validationResult(req);
+    
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty())
+            return res.status(400).json({errors:errors.array()});
+        
+        const article = await Article.create(req.body);
+        res.status(200).json(article);
 
-    if(!errors.isEmpty())
-        return res.status(400).json({errors:errors.array()});
+    } catch (error) {
+        res.status(500).json({errors:[{msg:'server error'}]});
+    }
+   
 
-    const article = await Article.create(req.body);
-    res.status(200).json(article);
+  
 
 });
 
