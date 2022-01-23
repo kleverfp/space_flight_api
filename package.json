@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/kleverfp/space_flight_api#readme",
   "dependencies": {
+    "axios": "^0.25.0",
     "body-parser": "^1.19.1",
     "config": "^3.3.7",
     "express": "^4.17.2",

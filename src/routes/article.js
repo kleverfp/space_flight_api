@@ -18,7 +18,7 @@ router.get('/articles',async(req,res)=>{
 
         // get total documents in the Posts collection 
         const count = await Article.countDocuments();
-
+        console.log("count:",count);
         // return response with posts, total pages, and current page
         res.json({
             articles,
@@ -32,7 +32,7 @@ router.get('/articles',async(req,res)=>{
 
 router.get('/articles/:id',async(req,res)=>{
     try{
-        const article = await Article.findById(req.params.id);
+        const article = await Article.findOne({id: req.params.id});
 
         if(!article)
             return  res.status(404).json({errors:[{msg:'not found'}]});
@@ -48,7 +48,8 @@ router.get('/articles/:id',async(req,res)=>{
 router.post('/articles',[
     body('title','title is required').trim().not().isEmpty(),
     body('url','url is required').trim().not().isEmpty(),
-],async (req,res)=>{
+    body('id','id is required').trim().not().isEmpty()],
+    async (req,res)=>{
     
     try {
         const errors = validationResult(req);
@@ -69,28 +70,33 @@ router.post('/articles',[
 
 router.put('/articles/:id',[
     body('title','title is required').trim().not().isEmpty(),
-    body('url','title is required').trim().not().isEmpty()],
+    body('url','title is required').trim().not().isEmpty(),
+    body('id','id is required').trim().not().isEmpty()],
     async(req,res)=>{
     try {
-        const article = await Article.findByIdAndUpdate(req.params.id,req.body);
+        const article = await Article.findOneAndUpdate({id:req.params.id},req.body);
 
         if(!article)
             return res.status(404).json({errors:[{msg:'not found'}]});
         
-        const newArticle = await Article.findById(req.params.id);
+        const newArticle = await Article.findById(article._id);
 
         res.status(200).json(newArticle);
+        
     } catch (err) {
+        console.error(err.message);
         res.status(500).json({errors:[{msg:'server error'}]});
     }
 });
 
 router.delete('/articles/:id',async(req,res)=>{
     try {
-        const article = await Article.findByIdAndRemove(req.params.id);
+        const article = await Article.findOne({id:req.params.id});
         
         if(!article)
             return res.status(404).json({errors:[{msg:'not found'}]});
+
+        await Article.findByIdAndDelete(article._id);
         
         res.status(200).json(article);
 

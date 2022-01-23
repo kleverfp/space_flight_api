@@ -1,0 +1,1 @@
+0 9 * * * /bin/bash <path_to_project>/update_local_db.sh
