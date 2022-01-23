@@ -21,7 +21,7 @@ const getArticle = async()=>{
         while(page <= totalPages){
             send_article_to_spaceflight_database(page);
             page++;
-            await sleep(500);
+            await sleep(5000);
         }
          
     } catch (error) {
